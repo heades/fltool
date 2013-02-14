@@ -6,12 +6,13 @@
 # a course. 
 
 # Flags
-HELP=-h      # The help message.
-INIT=-t      # Initialize.
-IMPORT=-i    # Import.
-EXPORT=-e    # Export.
-IE=-ie       # Export then Import in one shot.
-USER_FLAG=-u # Set a group of users.
+HELP=-h         # The help message.
+INIT=-t         # Initialize.
+IMPORT=-i       # Import.
+EXPORT=-e       # Export.
+IE=-ie          # Export then Import in one shot.
+USER_FLAG=-u    # Set a group of users.
+SETTING_FLAG=-s # Set some nice settings.
 
 # Inits a set of dirs as Fossil repos.
 function fl_init {
@@ -85,6 +86,22 @@ function fl_ie {
     fl_import $REPOS_PATH $REPO_PAT $CONFIG_PATH
 }
 
+function fl_settings {
+    REPOS_PATH=$1
+    REPO_PAT=$2
+    HEAD="fossil settings"
+
+    for i in $(ls $REPOS_PATH) 
+    do
+        TAIL="-R $REPOS_PATH/$i/$REPO_PAT"
+
+        # Set local auth.
+        $HEAD localauth 1 $TAIL
+        # Enable captcha.
+        $HEAD auto-captcha 1 $TAIL        
+    done
+}
+
 function help_msg {
     echo "The Fossil Tool for Courses.";
     echo;
@@ -101,6 +118,8 @@ function help_msg {
                                                 configuration into all the Fossil repos under repos_path named repo_pat."
     echo;
     echo "$USER_FLAG user_cfg_path                                Creates all the users specified in the user config user_cfg.";
+    echo;
+    echo "$SETTING_FLAG repos_path repo_pat                          Enables local auth. and captcha for all repos under repos_path named repo_pat.";
     exit 0;    
 }
 
@@ -108,31 +127,24 @@ function help_msg {
 if [ $HELP = $1 ] 
 then
     help_msg
+elif [ $IMPORT = $1 ] 
+then
+    fl_import $2 $3 $4
+elif [ $EXPORT = $1 ] 
+then
+    fl_export $2 $3
+elif [ $INIT = $1 ] 
+then
+    fl_init $2 $3 $4
+elif [ $USER_FLAG = $1 ] 
+then
+    fl_add_users $2
+elif [ $IE = $1 ]
+then
+    fl_ie $2 $3 $4 $5
+elif [ $SETTING_FLAG = $1 ] 
+then
+    fl_settings $2 $3
 else
-    if [ $IMPORT = $1 ] 
-    then
-        fl_import $2 $3 $4
-    else 
-        if [ $EXPORT = $1 ] 
-        then
-            fl_export $2 $3
-        else 
-            if [ $INIT = $1 ] 
-            then
-                fl_init $2 $3 $4
-            else 
-                if [ $USER_FLAG = $1 ] 
-                then
-                    fl_add_users $2
-                else
-                    if [ $IE = $1 ]
-                    then
-                        fl_ie $2 $3 $4 $5
-                    else
-                        help_msg
-                    fi
-                fi
-            fi
-        fi    
-    fi
+    help_msg
 fi
