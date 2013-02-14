@@ -1,0 +1,165 @@
+=The Fossil Tool README File=
+
+Here I will give several examples illustrating how to use
+the Fossil repo tool fltool.sh.
+
+Suppose we wish to create a number of fossil repos under a
+common directory.  That is we have the following situation:
+
+% for i in {1..10} do; mkdir -p repos/testpo$i; done
+
+Now using fltool.sh we can init all of these repos at once.
+Each repo will be named "repo."
+
+% fltool.sh -i ./repos repo $PWD/init.output
+%
+
+The previous command initializes all of the dirs under repos as Fossil
+repos names repo.  All of the data returned by fossil is then added to
+the file init.output.
+
+When using fltool.sh never end dir names with a '/'.  It inserts these for 
+you.
+
+Now we can see all the repos we created here:
+% ll ./repos/*/*
+-rw-r--r--  1 hde  staff  56320 Feb 14 13:35 repos/testpo1/repo
+-rw-r--r--  1 hde  staff  56320 Feb 14 13:35 repos/testpo10/repo
+-rw-r--r--  1 hde  staff  56320 Feb 14 13:35 repos/testpo2/repo
+-rw-r--r--  1 hde  staff  56320 Feb 14 13:35 repos/testpo3/repo
+-rw-r--r--  1 hde  staff  56320 Feb 14 13:35 repos/testpo4/repo
+-rw-r--r--  1 hde  staff  56320 Feb 14 13:35 repos/testpo5/repo
+-rw-r--r--  1 hde  staff  56320 Feb 14 13:35 repos/testpo6/repo
+-rw-r--r--  1 hde  staff  56320 Feb 14 13:35 repos/testpo7/repo
+-rw-r--r--  1 hde  staff  56320 Feb 14 13:35 repos/testpo8/repo
+-rw-r--r--  1 hde  staff  56320 Feb 14 13:35 repos/testpo9/repo
+-rw-r--r--  1 hde  staff  56320 Feb 14 13:35 repos/testpodo/repo
+
+and the output:
+% cat init.output
+Repo: repos/testpo1/repo
+project-id: 17b21fd2df4fb412f3c143a1e575af3294f20b96
+server-id:  b32aec9da99241bb7afea2107c9c7519ddc9583e
+admin-user: hde (initial password is "a28a87")
+
+
+Repo: repos/testpo10/repo
+project-id: 05cac217311dcec8e524d4f3c584a0d5cae6dad1
+server-id:  ce2d9d03ac15b39f7c203734135c3d97de8ea3ef
+admin-user: hde (initial password is "808050")
+
+
+Repo: repos/testpo2/repo
+project-id: 487b39d8f31e2944f1b5d09d149651d7c609f084
+server-id:  92869e70f97375b153f5dd57de419facce874d1a
+admin-user: hde (initial password is "d5ea70")
+
+
+Repo: repos/testpo3/repo
+project-id: ed7e2cecc19ad552bb65d30b8c93faad09bd10b1
+server-id:  d4594c5ab97c0cb94fef69951356aa2ae5ad9688
+admin-user: hde (initial password is "ea74af")
+
+
+Repo: repos/testpo4/repo
+project-id: 8f7751b52dc4bec8e968a2bcf187eeae88c2a37c
+server-id:  5193e03c45a5e33b1a516335493c2f50da33f8c4
+admin-user: hde (initial password is "a97df5")
+
+
+Repo: repos/testpo5/repo
+project-id: 5b020945a1faf781a08af32be309d32d8f7ed138
+server-id:  47d4bc26aaaf933639fd35d5a4655471574aaf67
+admin-user: hde (initial password is "fec810")
+
+
+Repo: repos/testpo6/repo
+project-id: 6c56a537ca11695acfc3491add2cc660985b15bf
+server-id:  0f6432ccb2c7ba9d240a81b449698571773fe79a
+admin-user: hde (initial password is "c2e871")
+
+
+Repo: repos/testpo7/repo
+project-id: 2b2f226f2c4ad22f60bc97275e857b8ad71de688
+server-id:  c2fff898ad6ce65e9116e86a12c28d03d01cf723
+admin-user: hde (initial password is "a1b85d")
+
+
+Repo: repos/testpo8/repo
+project-id: 5677944768963c4c177fb50d07d9f83de7be85b5
+server-id:  f1361f8ceb98fe218eb00a927a6c57954cba68df
+admin-user: hde (initial password is "8c380b")
+
+
+Repo: repos/testpo9/repo
+project-id: 7b578fb484ddf0e6c69856511343f78cb0afd563
+server-id:  12b7195185e4d63008a5aa086222550971bf5d41
+admin-user: hde (initial password is "9bae1e")
+
+
+Repo: repos/testpodo/repo
+project-id: ece98ac3a3735c16efe9375abbe30e7d0c11f040
+server-id:  97c70c45333b82383781d5734377d74c4bfb6cd3
+admin-user: hde (initial password is "a279dc")
+
+The tool fltool.sh can be used to export and import Fossil
+configuration files as well.  Importing will actually merge
+the configuration file with the destination repo.  Therefore,
+existing values are maintained.
+
+==Exporting a Configuration File==
+
+% fltool.sh -e ./repos/testpo1/repo $PWD/testpo1.cfg
+Here the path to the configuration files *must* be *absolute*.
+
+==Importing a Configuration Files==
+We can then import the configuration file into all of our
+repos under the repos directory.
+
+% fltool.sh -i ./repos repo ./testpo1.cfg
+
+We rolled both of these operations into a single command.
+% fltool.sh -ie ./repos/testpo1/repo $PWD/testpo1.cfg ./repos repo
+
+This exports the configuration of testpo1/repo and then imports it
+into all the fossil repos under the dir repos named repo.
+
+==Adding Users==
+We can users across many Fossil repos.  To do this we first need to create
+a user configuration file.  
+
+The user configuration file consists of one or more lines with the following
+format:
+
+repo_path:username:email:password:capabilities
+
+For example here is the one we will use here:
+% cat user.cfg
+/Users/hde/tmp/repos/testpo2/repo:user1:email1:changeme:asuv
+/Users/hde/tmp/repos/testpo2/repo:user2:email2:changeme:asuvb
+/Users/hde/tmp/repos/testpo2/repo:user3:email3:changeme:bvu
+%
+
+To add all the users to their respective Fossil repos simply run
+the following
+
+% fltool.sh -u user.cfg
+%
+
+We can see the effects by using the following command:
+% fossil user list -R repos/testpo2/repo
+anonymous    Anon
+developer    Dev
+hde          
+nobody       Nobody
+reader       Reader
+user1        email1
+user2        email2
+user3        email3
+%
+% fossil user capabilities user1 -R repos/testpo2/repo
+asuv
+%
+
+fltool.sh is designed to be extended.  Please feel free to extend it
+further.
